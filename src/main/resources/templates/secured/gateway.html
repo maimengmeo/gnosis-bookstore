@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+		xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<h1>Welcome to Gnosis Bookstore</h1>
+	
+	User's Name: <span sec:authentication="name"></span><br>
+	Roles: <span sec:authentication="principal.authorities"></span><br>
+	
+	<div sec:authorize="hasRole('ROLE_CLIENT')">
+		<p>Go to the <a href="#" th:href="@{/client}">Client Page</a></p>
+	</div>
+	
+	<div sec:authorize="hasRole('ROLE_STAFF')">
+		<p>Go to the <a href="#" th:href="@{/staff}">Staff Page</a></p>
+	</div>
+	
+	<form action="#" th:action="@{/logout}" method="POST">
+		<input type="submit" value="Logout">
+	</form>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thympleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Login</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+<link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+	<header th:insert="fragment/nav-bar-client.html :: page-header"></header><br>
+	<div class="login-reg-form">
+	<div >		
+		<h3 style="font-size: 18px">LOG IN TO GNOSIS BOOKSTORE</h3> <br>		
+		<div th:if="${param.error}" style="color:red;">
+			<p>Invalid User Name or Password</p>
+		</div>
+		
+		<div th:if="${param.logout}" style="color:red;">
+			<p>You are now logged out</p>
+		</div>		
+		<div>	
+			<form action="#" th:action="@{/login}" method="POST">
+				<p>User Name: 
+					<input type="text" name="username">
+				</p>
+				<p>Password:     
+					<input type="password" name="password">
+				</p>
+				<br>
+				<input type="submit" value="Log In" class="btn btn-dark">
+				<br><br>
+				<p>Not Register? <a href="/registerPage">Register Here</a></p>
+				<br>
+				<a href="/">Back to Home</a>
+			</form>
+		</div>
+	</div>
+	</div>
+</body>
+</html>
