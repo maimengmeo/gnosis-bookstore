@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import ca.sheridancollege.beans.Book;
@@ -118,7 +119,7 @@ public class HomeController {
 	
 	//GET BOOK
 	@SuppressWarnings("unused")
-	@GetMapping("/book/{isbn}")
+	@GetMapping("/books/{isbn}")
 	public ResponseEntity<?> getBook(@PathVariable Long isbn) {
 		
 		Book book = database.getBook(isbn);
@@ -132,8 +133,24 @@ public class HomeController {
 		}
 	}
 	
+	@GetMapping("/books")
+	public ResponseEntity<?> getBooks() {
+		
+		List<Book> books = database.getBooks();
+		
+		for (Book book: books) {			
+			book.setReviews(database.getReviews(book.getIsbn()));
+		}
+		
+		if (books != null) {
+			return ResponseEntity.ok(books);
+		} else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Message("error", "No such record"));
+		}
+	}
+	
 	//GET REVIEWS
-	@GetMapping("/book/{isbn}/reviews")
+	@GetMapping("/books/{isbn}/reviews")
 	public ResponseEntity<?> getReviews (@PathVariable Long isbn) {
 		
 		List<Review> reviews = database.getReviews(isbn);
@@ -145,7 +162,7 @@ public class HomeController {
 		}
 	}
 	
-	@GetMapping("/book/{isbn}/{id}")
+	@GetMapping("/books/{isbn}/reviews/{id}")
 	public ResponseEntity<?> getReview (@PathVariable Long isbn, @PathVariable Long id) {
 		
 		Review review = database.getReview(isbn, id);
@@ -158,17 +175,17 @@ public class HomeController {
 	}
 	
 	//POST REVIEW
-	@PostMapping (value="/book", consumes="application/json", produces="application/json")
-	public ResponseEntity<?> postReview (@RequestBody Review review) {
+	@PostMapping (value="/books/{isbn}/reviews", consumes="application/json", produces="application/json")
+	public ResponseEntity<?> postReview (@RequestBody Review review, @PathVariable Long isbn) {
 		
 		try {
-			Long id = (long) database.addReview(review, review.getIsbn());
+			Long id = (long) database.addReview(review, isbn);
 			review.setId(id);
 			URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(id).toUri();
 			return ResponseEntity.created(location).body(review);
 			
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.LENGTH_REQUIRED).body(new Message("error", "Can't submit empty review"));
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Message("error", "Review was not submited"));
 		}
 	}
 	
@@ -192,7 +209,9 @@ public class HomeController {
 	@PostMapping("/registerUser")
 	public String register (@RequestParam String username, 
 							@RequestParam String password,
-							@RequestParam String[] authorities, Model model) {
+							@RequestParam String[] authorities, 
+							RedirectAttributes redirectAttrs, HttpServletRequest request,
+							HttpSession session) {
 		
 		List<GrantedAuthority> authList = new ArrayList<>();
 		 			
@@ -200,7 +219,7 @@ public class HomeController {
 				if (auth == null) {
 					authList.add(new SimpleGrantedAuthority("ROLE_CLIENT")); //WHEN REGISTER, CLIENT WILL HAS ROL_CLIENT BY DEFAULT
 				} else {
-				authList.add(new SimpleGrantedAuthority(auth));				
+				authList.add(new SimpleGrantedAuthority(auth));	//roles picked by manager			
 				}
 		}
 		
@@ -208,11 +227,15 @@ public class HomeController {
 		
 		User user = new User (username, encodedPwd, authList);
 		
-		manager.createUser(user);
+		try {			
+			manager.createUser(user);			
+			redirectAttrs.addFlashAttribute("message", "Successfully Registered!");
+		} catch (Exception e) {
+			redirectAttrs.addFlashAttribute("message", "User was not created!");
+		}
 		
-		model.addAttribute("message", "Successfully Registered");
-		
-		return "/login";
+		//after register, client will be navigated to login page to login, staff will be redirected to register page
+		return (request.isUserInRole("STAFF")) ? "redirect:/registerPage" : "redirect:/login";
 	}
 	
 	

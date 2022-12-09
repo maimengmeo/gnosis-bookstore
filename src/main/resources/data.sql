@@ -11,5 +11,7 @@ VALUES (9780385660075, 'The Kite Runner', 'Khaled Hosseini', 'Fiction',	23.0, 80
 INSERT INTO reviews (username, text, isbn)
 VALUES ('coolcat', 'A wonderfully brave story about childhood, betrayal and forgiveness, 
 		this book will change the way you look at the world.',9780385660075),
+		('badbunny', 'An amazing first novel - set in Afghanistan, 
+		it explores the differences between classes in the society.', 9780385660075),
 		('tweetybird', 'This book by Stephen Hawking was excellent becasue he explained each layer of the theories very well. 
 		The pictures and diagrams explained the idea of the theories.', 9780553380163)

@@ -194,7 +194,7 @@ public class DatabaseAccess {
 			.addValue("text", review.getText())
 			.addValue("username", review.getUsername());
 
-		KeyHolder key = new GeneratedKeyHolder();
+		KeyHolder key = new GeneratedKeyHolder(); //get id of row
 		
 		Long returnValue = (long) jdbc.update(query, namedParameters, key);
 		
