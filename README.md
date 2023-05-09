@@ -1,6 +1,8 @@
 # gnosis-bookstore
 Book Store Web Application using Java Spring Boot Thymeleaf, Web Services RESTful API
 
+DEMO:
+
 https://youtu.be/1gD1kn9nCQo
 
 •	Created a web application with Admin and Client sections for a bookstore.
